@@ -4,11 +4,46 @@ using UnityEngine;
 
 namespace TowerDefense
 {
+    [RequireComponent(typeof(Animator))]
     public class Tower : MonoBehaviour
     {
         [SerializeField] private List<GameObject> enemiesInRange = new List<GameObject>();
         public Tower_SO towerType;
         private bool firing = false;
+        GameObject enemeyTarget;
+        Animator animator;
+
+        private void Start()
+        {
+            animator = GetComponent<Animator>();
+        }
+
+        public GameObject GetEnemyTarget()
+        {
+            return enemeyTarget;
+        }
+
+        public void DamageTarget()
+        {
+            if(!enemeyTarget)
+            return;
+            
+            Health.TryDamage(enemeyTarget, towerType.damage);
+        }
+
+        private void removeDestroyedEnemies()
+        {
+            int i = 0;
+            while(i< enemiesInRange.Count)
+            {
+                if (enemiesInRange[i])
+                {
+                    i++;
+                }
+                else
+                enemiesInRange.RemoveAt(i);
+            }
+        }
 
         IEnumerator DamageEnemyTarget()
         {
@@ -16,16 +51,13 @@ namespace TowerDefense
 
             while(enemiesInRange.Count > 0)
             {
-                if(!enemiesInRange[0]) 
+                removeDestroyedEnemies();
+                if(enemiesInRange.Count> 0)
                 {
-                    enemiesInRange.RemoveAt(0);
-                }
-                else
-                {
-                    Health.TryDamage(enemiesInRange[0], towerType.damage);
+                    enemeyTarget = enemiesInRange[0];
+                    animator.SetTrigger("Fire");
                 }
                 
-
                 yield return new WaitForSeconds(towerType.fireRate);
             }
 
