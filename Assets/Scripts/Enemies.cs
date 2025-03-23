@@ -30,6 +30,10 @@ namespace TowerDefense{
                 if(transform.position == target) index++;
                 yield return null;
             }
+            
+            Player player = FindObjectOfType<Player>();
+            Health.TryDamage(player.gameObject,damage);
+            Destroy(gameObject);
         }
     }
 }
